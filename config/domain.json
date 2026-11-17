@@ -1,0 +1,8 @@
+{
+  "name": "跨云数据产品",
+  "event_kinds": [
+    "request",
+    "transfer",
+    "charge"
+  ]
+}
