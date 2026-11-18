@@ -1,30 +1,102 @@
 {
   "entities": [
-    {
-      "entity_id": "entity-1",
-      "label": "业务主体一",
-      "group_id": "group-1"
-    }
+    {"entity_id": "team-x", "label": "使用方团队X", "group_id": "group-1"},
+    {"entity_id": "team-y", "label": "使用方团队Y", "group_id": "group-1"},
+    {"entity_id": "finance-a", "label": "云账户A财务实体", "group_id": "group-2"}
   ],
   "aliases": [
-    {
-      "source": "system",
-      "external_id": "external-1",
-      "entity_id": "entity-1"
-    }
+    {"source": "applog", "external_id": "caller-x", "entity_id": "team-x", "linked_at": "2026-11-01T00:00:00+08:00"},
+    {"source": "applog", "external_id": "caller-y", "entity_id": "team-y", "linked_at": "2026-11-01T00:00:00+08:00"},
+    {"source": "netflow", "external_id": "caller-x", "entity_id": "team-x", "linked_at": "2026-11-01T00:00:00+08:00"},
+    {"source": "netflow", "external_id": "caller-y", "entity_id": "team-y", "linked_at": "2026-11-01T00:00:00+08:00"},
+    {"source": "bill", "external_id": "acct-a", "entity_id": "finance-a", "linked_at": "2026-11-01T00:00:00+08:00"}
+  ],
+  "products": [
+    {"product": "p-alpha", "owner": "团队甲", "account": "acct-a"},
+    {"product": "p-beta", "owner": "团队乙", "account": "acct-b"}
+  ],
+  "pricing": [
+    {"version_id": "pr-alpha-egress-v1", "product": "p-alpha", "direction": "egress", "fee_type": "transfer",
+     "valid_from": "2026-11-01T00:00:00+08:00", "observed_at": "2026-10-20T09:00:00+08:00",
+     "rate": "0.50", "tiered": [{"up_to": 5, "rate": "0.50"}, {"up_to": 1000000, "rate": "0.40"}]},
+    {"version_id": "pr-alpha-req-v1", "product": "p-alpha", "direction": "egress", "fee_type": "request",
+     "valid_from": "2026-11-01T00:00:00+08:00", "observed_at": "2026-10-20T09:00:00+08:00", "rate": "0.02"},
+    {"version_id": "pr-beta-egress-v1", "product": "p-beta", "direction": "egress", "fee_type": "transfer",
+     "valid_from": "2026-11-01T00:00:00+08:00", "observed_at": "2026-10-20T09:00:00+08:00", "rate": "0.80"},
+    {"version_id": "pr-beta-req-v1", "product": "p-beta", "direction": "egress", "fee_type": "request",
+     "valid_from": "2026-11-01T00:00:00+08:00", "observed_at": "2026-10-20T09:00:00+08:00", "rate": "0.03"}
+  ],
+  "budgets": [
+    {"product": "p-alpha", "period": "2026-11", "amount": "3.00"},
+    {"product": "p-beta", "period": "2026-11", "amount": "20.00"}
   ],
   "events": [
-    {
-      "source": "system",
-      "event_id": "sample-1",
-      "revision": 1,
-      "kind": "request",
-      "entity": "external-1",
-      "occurred_at": "2026-11-01T10:00:00+08:00",
-      "observed_at": "2026-11-01T11:00:00+08:00",
-      "payload": {
-        "amount": 3
-      }
-    }
+    {"source": "applog", "event_id": "req-1", "revision": 1, "kind": "request", "entity": "caller-x",
+     "occurred_at": "2026-11-03T10:00:00+08:00", "observed_at": "2026-11-03T10:05:00+08:00",
+     "payload": {"product": "p-alpha", "call_class": "standard", "items": 0, "bytes": 1000000000, "route_id": "r-a"}},
+    {"source": "applog", "event_id": "req-2", "revision": 1, "kind": "request", "entity": "caller-x",
+     "occurred_at": "2026-11-03T10:01:00+08:00", "observed_at": "2026-11-03T10:06:00+08:00",
+     "payload": {"product": "p-alpha", "call_class": "retry", "items": 0, "bytes": 400000000, "route_id": "r-a"}},
+    {"source": "applog", "event_id": "req-3", "revision": 1, "kind": "request", "entity": "caller-y",
+     "occurred_at": "2026-11-05T14:00:00+08:00", "observed_at": "2026-11-05T14:10:00+08:00",
+     "payload": {"product": "p-alpha", "call_class": "batch", "items": 200, "bytes": 2000000000, "route_id": "r-a"}},
+    {"source": "applog", "event_id": "req-4", "revision": 1, "kind": "request", "entity": "caller-x",
+     "occurred_at": "2026-11-08T09:00:00+08:00", "observed_at": "2026-11-08T09:05:00+08:00",
+     "payload": {"product": "p-beta", "call_class": "standard", "items": 0, "bytes": 500000000, "route_id": "r-b"}},
+    {"source": "applog", "event_id": "req-5", "revision": 1, "kind": "request", "entity": "caller-x",
+     "occurred_at": "2026-11-08T09:02:00+08:00", "observed_at": "2026-11-08T09:07:00+08:00",
+     "payload": {"product": "p-beta", "call_class": "retry", "items": 0, "bytes": 500000000, "route_id": "r-b"}},
+    {"source": "applog", "event_id": "req-6", "revision": 1, "kind": "request", "entity": "caller-y",
+     "occurred_at": "2026-11-09T16:00:00+08:00", "observed_at": "2026-11-09T16:10:00+08:00",
+     "payload": {"product": "p-beta", "call_class": "batch", "items": 50, "bytes": 1000000000, "route_id": "r-b"}},
+
+    {"source": "netflow", "event_id": "flow-1", "revision": 1, "kind": "transfer", "entity": "caller-x",
+     "occurred_at": "2026-11-30T23:00:00+08:00", "observed_at": "2026-12-01T08:00:00+08:00",
+     "payload": {"account": "acct-a", "route_id": "r-a", "product": "p-alpha", "direction": "egress",
+                 "bytes": 1400000000, "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "netflow", "event_id": "flow-2", "revision": 1, "kind": "transfer", "entity": "caller-y",
+     "occurred_at": "2026-11-30T23:00:00+08:00", "observed_at": "2026-12-01T08:00:00+08:00",
+     "payload": {"account": "acct-a", "route_id": "r-a", "product": "p-alpha", "direction": "egress",
+                 "bytes": 2000000000, "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "netflow", "event_id": "flow-3", "revision": 1, "kind": "transfer", "entity": "caller-x",
+     "occurred_at": "2026-11-30T23:00:00+08:00", "observed_at": "2026-12-01T08:00:00+08:00",
+     "payload": {"account": "acct-b", "route_id": "r-b", "product": "p-beta", "direction": "egress",
+                 "bytes": 1000000000, "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "netflow", "event_id": "flow-4", "revision": 1, "kind": "transfer", "entity": "caller-y",
+     "occurred_at": "2026-11-30T23:00:00+08:00", "observed_at": "2026-12-01T08:00:00+08:00",
+     "payload": {"account": "acct-b", "route_id": "r-b", "product": "p-beta", "direction": "egress",
+                 "bytes": 1000000000, "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+
+    {"source": "bill", "event_id": "bill-1", "revision": 1, "kind": "charge", "entity": "acct-a",
+     "occurred_at": "2026-12-02T10:00:00+08:00", "observed_at": "2026-12-02T10:00:00+08:00",
+     "payload": {"account": "acct-a", "route_id": "r-a", "charge_type": "transfer",
+                 "allocation_basis": "bytes", "amount": "1.70", "pricing_version": "pr-alpha-egress-v1",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "bill", "event_id": "bill-2", "revision": 1, "kind": "charge", "entity": "acct-a",
+     "occurred_at": "2026-12-02T10:00:00+08:00", "observed_at": "2026-12-02T10:00:00+08:00",
+     "payload": {"account": "acct-a", "charge_type": "request", "allocation_basis": "requests",
+                 "amount": "4.04", "pricing_version": "pr-alpha-req-v1",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "bill", "event_id": "bill-3", "revision": 1, "kind": "charge", "entity": "acct-b",
+     "occurred_at": "2026-12-02T10:00:00+08:00", "observed_at": "2026-12-02T10:00:00+08:00",
+     "payload": {"account": "acct-b", "route_id": "r-b", "charge_type": "transfer",
+                 "allocation_basis": "bytes", "amount": "1.60", "pricing_version": "pr-beta-egress-v1",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "bill", "event_id": "bill-4", "revision": 1, "kind": "charge", "entity": "acct-b",
+     "occurred_at": "2026-12-02T10:00:00+08:00", "observed_at": "2026-12-02T10:00:00+08:00",
+     "payload": {"account": "acct-b", "product": "p-beta", "charge_type": "request",
+                 "allocation_basis": "requests", "amount": "1.62", "pricing_version": "pr-beta-req-v1",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+    {"source": "bill", "event_id": "bill-5", "revision": 1, "kind": "charge", "entity": "acct-a",
+     "occurred_at": "2026-12-02T10:00:00+08:00", "observed_at": "2026-12-02T10:00:00+08:00",
+     "payload": {"account": "acct-a", "route_id": "r-a", "charge_type": "transfer",
+                 "allocation_basis": "bytes", "amount": "0.20",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}},
+
+    {"source": "bill", "event_id": "bill-6", "revision": 1, "kind": "charge", "entity": "acct-a",
+     "occurred_at": "2026-12-10T10:00:00+08:00", "observed_at": "2026-12-10T10:00:00+08:00",
+     "payload": {"account": "acct-a", "route_id": "r-a", "charge_type": "transfer",
+                 "allocation_basis": "bytes", "amount": "0.17", "credit": true, "pricing_version": "pr-alpha-egress-v1",
+                 "period_start": "2026-11-01T00:00:00+08:00", "period_end": "2026-12-01T00:00:00+08:00"}}
   ]
 }

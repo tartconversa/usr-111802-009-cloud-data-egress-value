@@ -4,5 +4,32 @@
     "request",
     "transfer",
     "charge"
-  ]
+  ],
+  "call_classes": [
+    "standard",
+    "retry",
+    "batch"
+  ],
+  "directions": [
+    "egress",
+    "ingress"
+  ],
+  "charge_types": [
+    "transfer",
+    "request"
+  ],
+  "allocation_bases": [
+    "bytes",
+    "requests"
+  ],
+  "charge_basis_default": {
+    "transfer": "bytes",
+    "request": "requests"
+  },
+  "currency": "CNY",
+  "bytes_per_gb": 1000000000,
+  "risk_thresholds": {
+    "watch": 0.8,
+    "breach": 1.0
+  }
 }

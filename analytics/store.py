@@ -15,9 +15,10 @@ def timestamp(value):
     return parsed.isoformat()
 
 class EventStore:
-    def __init__(self, connection, allowed_kinds):
+    def __init__(self, connection, allowed_kinds, payload_validator=None):
         self.connection = connection
         self.allowed_kinds = frozenset(allowed_kinds)
+        self.payload_validator = payload_validator
         connection.execute("""CREATE TABLE IF NOT EXISTS events (
             source TEXT NOT NULL, event_id TEXT NOT NULL, revision INTEGER NOT NULL,
             kind TEXT NOT NULL, entity TEXT NOT NULL, occurred_at TEXT NOT NULL,
@@ -41,6 +42,8 @@ class EventStore:
             raise ValueError("未知事件类型")
         if not isinstance(event["payload"], dict):
             raise ValueError("事件内容必须为对象")
+        if self.payload_validator is not None:
+            self.payload_validator(event["kind"], event["payload"])
         occurred, observed = timestamp(event["occurred_at"]), timestamp(event["observed_at"])
         deleted = event.get("deleted", False)
         if type(deleted) is not bool:

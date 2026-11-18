@@ -12,3 +12,16 @@ class ProductDirectory:
     def account(self, product):
         row = self.connection.execute("SELECT account FROM products WHERE product=?", (product,)).fetchone()
         return row[0] if row else None
+
+    def get(self, product):
+        row = self.connection.execute(
+            "SELECT product,owner,account FROM products WHERE product=?", (product,)).fetchone()
+        return dict(row) if row else None
+
+    def all(self):
+        return [dict(row) for row in self.connection.execute(
+            "SELECT product,owner,account FROM products ORDER BY product").fetchall()]
+
+    def account_products(self, account):
+        return [row[0] for row in self.connection.execute(
+            "SELECT product FROM products WHERE account=? ORDER BY product", (account,)).fetchall()]

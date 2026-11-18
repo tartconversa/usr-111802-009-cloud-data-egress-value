@@ -6,7 +6,8 @@ from analytics import AnalyticsService
 
 BASE = {"source":"system", "event_id":"e1", "revision":1,
         "kind":None, "entity":"external-1", "occurred_at":"2026-11-01T10:00:00+08:00",
-        "observed_at":"2026-11-01T11:00:00+08:00", "payload":{"amount":3}}
+        "observed_at":"2026-11-01T11:00:00+08:00",
+        "payload":{"amount":3, "product":"p-alpha", "call_class":"standard", "items":0}}
 
 class ServiceTests(unittest.TestCase):
     def setUp(self):
@@ -23,7 +24,9 @@ class ServiceTests(unittest.TestCase):
     def test_revision_and_asof(self):
         self.assertTrue(self.service.ingest(self.event))
         self.assertFalse(self.service.ingest(self.event))
-        changed = dict(self.event, revision=2, observed_at="2026-11-02T11:00:00+08:00", payload={"amount":5})
+        changed = dict(self.event, revision=2, observed_at="2026-11-02T11:00:00+08:00",
+                       payload={"amount":5, "product":"p-alpha",
+                                "call_class":"standard", "items":0})
         self.service.ingest(changed)
         self.assertEqual(self.service.summary()["subjects"]["entity-1"]["amount"], "5")
         self.assertEqual(self.service.summary("2026-11-01T12:00:00+08:00")["subjects"]["entity-1"]["amount"], "3")

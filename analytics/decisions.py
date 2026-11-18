@@ -28,3 +28,7 @@ class DecisionBook:
     def get(self, report_id):
         row = self.connection.execute("SELECT * FROM reports WHERE report_id=?", (report_id,)).fetchone()
         return (dict(row) | {"body": json.loads(row["body"])}) if row else None
+
+    def list_reports(self):
+        return [self.get(row[0]) for row in self.connection.execute(
+            "SELECT report_id FROM reports ORDER BY created_at, report_id").fetchall()]
